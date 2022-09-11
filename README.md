@@ -2,7 +2,7 @@
 This is a simple app for quiz taking with authentication
 
 ## Project overview
-<img src="ImagesForGithub/allProject.jpeg">
+<img src="ImagesForGithub/AllProject.jpeg">
 <img src="ImagesForGithub/FullDatabase.png">
 
 ## About The Project
