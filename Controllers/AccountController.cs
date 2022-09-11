@@ -39,6 +39,8 @@ namespace QuizAPI.Controllers
             _memoryCache = memoryCache;
         }
         [HttpPost("[action]")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> Login(LoginDTO loginDTO)
         {
             var user = await _userManager.FindByEmailAsync(loginDTO.Email);
@@ -64,6 +66,8 @@ namespace QuizAPI.Controllers
         
         [HttpGet("[action]")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<List<QuizUserDTO>>> GetAllUsers()
         {
             if (User.Identity.IsAuthenticated)
@@ -102,6 +106,8 @@ namespace QuizAPI.Controllers
         
         [HttpGet("[action]/{id}")]
         [Authorize(Roles ="Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<QuizUserDTO>> GetUserById([Required] string id)
         {
             if (!User.Identity.IsAuthenticated)
@@ -131,6 +137,8 @@ namespace QuizAPI.Controllers
 
         [HttpPut("[action]/{userId}")]
         [Authorize(Roles ="Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateUserRole([Required] string userId,[Required]string roleName)
         {
             if(!User.Identity.IsAuthenticated)
@@ -181,6 +189,8 @@ namespace QuizAPI.Controllers
         
         [HttpDelete("[action]/{id}")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult> DeleteUserById([Required]string id)
         {
             if (!User.Identity.IsAuthenticated)
@@ -208,6 +218,8 @@ namespace QuizAPI.Controllers
         
         [HttpPut("[action]/{id}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<RegisterUserDTO>> UpdateUserById([Required] string id, UpdateDTO updateDTO)
         {
             if (!User.Identity.IsAuthenticated)

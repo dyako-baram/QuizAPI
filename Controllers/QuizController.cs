@@ -33,6 +33,8 @@ namespace QuizAPI.Controllers
 
         [HttpGet("[action]")]
         [Authorize(Roles ="Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<List<ShowQuizzesDTO>>> GetAllQuizzesForAdminOnly()
         {
             if (!User.Identity.IsAuthenticated)
@@ -76,6 +78,8 @@ namespace QuizAPI.Controllers
 
         [HttpGet("[action]")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<List<ShowQuizzesDTO>>> GetAllApprovedQuizzes()
         {
             if (!User.Identity.IsAuthenticated)
@@ -120,6 +124,8 @@ namespace QuizAPI.Controllers
 
         [HttpGet("[action]/{id}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<ShowQuizzesDTO>> GetQuizById([Required]int id)
         {
             if (!User.Identity.IsAuthenticated)
@@ -156,6 +162,8 @@ namespace QuizAPI.Controllers
 
         [HttpGet("[action]")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<List<string>>> GetAllQuizGenres()
         {
             if (!User.Identity.IsAuthenticated)
@@ -168,6 +176,8 @@ namespace QuizAPI.Controllers
         
         [HttpPost("[action]")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CreateQuiz(CreateQuizDTO createQuizDTO)
         {
             if (!User.Identity.IsAuthenticated)
@@ -230,6 +240,8 @@ namespace QuizAPI.Controllers
         }
         [HttpPost("[action]/{id}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> TakeAQuizById([Required]int id,QuestionAnswerDTO quizAnswers)
         {
             if (!User.Identity.IsAuthenticated)
@@ -292,6 +304,8 @@ namespace QuizAPI.Controllers
         }
         [HttpGet("[action]")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<List<UserQuizResult>>> GetUserQuizResult()
         {
             if (!User.Identity.IsAuthenticated)
@@ -345,6 +359,8 @@ namespace QuizAPI.Controllers
 
         [HttpGet("[action]/{id}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<bool>> CanUserTakeAQuizToday([Required]int id)
         {
             return await CanUserTakeAQuiz(id);
@@ -352,6 +368,8 @@ namespace QuizAPI.Controllers
 
         [HttpDelete("[action]/{ids}")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> DeleteQuizzesById([Required]int[] ids)
         {
             if (!User.Identity.IsAuthenticated)
@@ -373,6 +391,8 @@ namespace QuizAPI.Controllers
 
         [HttpPut("[action]/{id}")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> PublishAndUnpublishQuizById([Required]int id, PublishAndUnpublishQuizDTO publishAndUnpublishQuizDTO)
         {
             if (!User.Identity.IsAuthenticated)
@@ -392,6 +412,8 @@ namespace QuizAPI.Controllers
 
         [HttpPut("[action]/{id}")]
         [Authorize(Roles ="Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateQuizById([Required]int id, UpdateQuizByIdDTO updateQuizByIdDTO)
         {
             if (!User.Identity.IsAuthenticated)
@@ -424,6 +446,8 @@ namespace QuizAPI.Controllers
 
         [HttpPut("[action]/{id}")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateQuizOnlyById([Required]int id, UpdateQuizOnlyDTO updateQuizOnlyDTO)
         {
             if (!User.Identity.IsAuthenticated)
@@ -445,6 +469,8 @@ namespace QuizAPI.Controllers
         }
         [HttpPut("[action]/{id}")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateQuestionOnlyById([Required]int id, UpdateQuestionDTO updateQuestionDTO)
         {
             if (!User.Identity.IsAuthenticated)
@@ -462,6 +488,8 @@ namespace QuizAPI.Controllers
         }
         [HttpPut("[action]/{id}")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateAnswerOnlyById([Required]int id, UpdateAnswerDTO updateAnswerDTO)
         {
             if (!User.Identity.IsAuthenticated)
