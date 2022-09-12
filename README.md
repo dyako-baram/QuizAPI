@@ -6,10 +6,44 @@ This is a simple app for quiz taking with authentication
 <img src="ImagesForGithub/FullDatabase.png">
 
 ## About The Project
-- all endpoints are properly authorized and returns proper codes
-- all inputs has proper validation
-- a memory cache is impleamented for few endpoints
-- for the naming convension, the variables has readable but long names 
+1.	User can register by providing the their basic information along with email and password
+1.	Users can login using email and password to
+    1. take a quiz
+    1. show history of quizzes they took
+    1. and Create their own quiz which needs to be reviewed by the administrator before it's published
+1. Quiz Portal Management includes the following
+    1. create read update delete Quiz
+    1. Publish & unpublishing quizzes
+    1. Multiple-Answer based questions for each quiz.
+    1. Minimum 1 question per quiz before publishing
+    1. Minimum 2 answers per question before question creation
+    1. In each question there is only on answer which has to be ticked as correct answer
+    1. Validity of duration of quiz. For example: a quiz shall be submitted within 10 mins.
+    1. different genres of quizzes will be created based on previus quizzes
+1. multiple requirements is impleamented to take a quiz
+    1. 	Users can attempt to take a particular quiz twice per day.
+    1. Once a user finishes taking a quiz, then the duration limit of the quiz will be compared with the actual time of the user’s submission. The scenarios are following:
+        1. If a user fails the duration limit, then the success rate is zero. otherwise, each answer are calculated before  recording them as an attempt record
+
+1. the quiz history records the following
+    1.	Time the quiz was taken 
+    1. 	Time the quiz was 
+    1. 	The success rate in percentage. Ex: out of 4 questions two answers were correct, therefore the success rate is 50% or 0.5
+1. User is allowed to attempt on a particular quiz only twice a day
+1. when it comes to the roles and permissions the pojects works the following
+    1. the roles must be pre-determined due to the way how ASP Identity membership works
+    1. the projects uses roles of `admin` and `user` to differentiate authorization
+    1. only Admins can change others Roles
+    1. admins have full privilege
+    1. other users have limited permission 
+1. all endpoints are RESTfull
+1. all endpoints are properly authorized
+1. all inputs are properly authorized
+1. the code is very readable following naming conventions with understandable comments 
+1. all errors are handled properly
+1. a caching system is impleamented 
+
+
 ## How to get started 
 ---
 **Note** : dotnet 6 sdk and postgres is required
@@ -112,7 +146,7 @@ example
 ```
 
 ---
-## Quiz End Points
+## Quiz EndPoints
 
 ### `api/quiz/GetAllQuizzesForAdminOnly`
 
@@ -150,7 +184,7 @@ example
 
 ### `api/quiz/GetAllApprovedQuizzes`
 
-this will returns all quizzes that admin approves of
+this will returns all quizzes that admins approves of
 
 example
 
@@ -189,7 +223,7 @@ this returns all genres that are avilable
 
 ### `api/quiz/createQuiz`
 
-this endpoint creates new endpoints
+this endpoint creates new quizes
 
 example
 ```
@@ -300,7 +334,7 @@ example
 
 **Admins only**
 
-updatethe quiz
+update the quiz
 
 example
 ```
