@@ -12,12 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
-    options.MapType<TimeSpan>(() => new OpenApiSchema { Type = "string", Example = new OpenApiString("00:00:00") });
+    options.MapType<TimeSpan>(() => new OpenApiSchema { Type = "string", Example = new OpenApiString("00:00:00") });//fixing the format for TimeSpan
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
         Title = "Quiz API",
-        Description = "An ASP.NET Core Web API for Quiz App With Authentication",
+        Description = "An ASP.NET Core Web API for Quiz App With Cookie Based Authentication",
         License = new OpenApiLicense
         {
             Name = "MIT Licence",
@@ -27,11 +27,14 @@ builder.Services.AddSwaggerGen(options => {
 }
     );
 builder.Services.AddMemoryCache();
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
 
-builder.Services.AddIdentity<QuizUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");//get connection string from appsettings.json
+builder.Services.AddDbContext<ApplicationDbContext>(options => 
+    options.UseNpgsql(connectionString));// configure the ORM
+
+builder.Services.AddIdentity<QuizUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders(); // add memership system (identity)
+
+//modify the rules for the User
 builder.Services.Configure<IdentityOptions>(opt =>
 {
 
@@ -42,13 +45,13 @@ builder.Services.Configure<IdentityOptions>(opt =>
     opt.Password.RequireNonAlphanumeric = false;
     opt.Password.RequiredUniqueChars = 0;
 
-    opt.SignIn.RequireConfirmedEmail = false;
+    opt.SignIn.RequireConfirmedEmail = false; // for testing only
 
     opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     opt.Lockout.AllowedForNewUsers = true;
     opt.Lockout.MaxFailedAccessAttempts = 5;
 
-    opt.User.RequireUniqueEmail = true;
+    opt.User.RequireUniqueEmail = true;// prevents dupicate emails
 });
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -56,12 +59,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
     options.SlidingExpiration = true;
-    options.Events.OnRedirectToAccessDenied = context =>
+    options.Events.OnRedirectToAccessDenied = context => // give back 401 instead of redirecting the user
     {
         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
         return Task.CompletedTask;
     };
-    options.Events.OnRedirectToLogin = context =>
+    options.Events.OnRedirectToLogin = context => // give back 401 instead of redirecting the user
     {
         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
         return Task.CompletedTask;
@@ -71,13 +74,12 @@ builder.Services.ConfigureApplicationCookie(options =>
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
-    var dataContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dataContext.Database.Migrate();
 
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<ApplicationDbContext>();
-    await context.Database.MigrateAsync();
+    await context.Database.MigrateAsync();// migrate the database 
 
+    //seed the databse
     var userManager = services.GetRequiredService<UserManager<QuizUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     await ContextSeed.SeedRolesAsync(roleManager);

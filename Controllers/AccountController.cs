@@ -38,29 +38,30 @@ namespace QuizAPI.Controllers
             _roleManager = roleManager;
             _memoryCache = memoryCache;
         }
+        
         [HttpPost("[action]")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> Login(LoginDTO loginDTO)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> Login(LoginDTO loginDTO) 
         {
             var user = await _userManager.FindByEmailAsync(loginDTO.Email);
             if (user == null)
             {
                 return NotFound();
             }
-            await _signInManager.PasswordSignInAsync(user, loginDTO.Password, false, false);
-            return Ok();
+            var result=await _signInManager.PasswordSignInAsync(user, loginDTO.Password, false, false);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest("Incorrect password");
         }
         
         [HttpGet("[action]")]
         public async Task<ActionResult> LogOut()
         {
-            var user = _userManager.GetUserAsync(User);
-            if (user != null)
-            {
-                await _signInManager.SignOutAsync();
-            }
-
+            await _signInManager.SignOutAsync();
             return Ok();
         }
         
@@ -72,15 +73,19 @@ namespace QuizAPI.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                //Impleament Caching
+                
                 List<QuizUser> users;
+                // get data from memory cahce if exist
                 users = _memoryCache.Get<List<QuizUser>>("AllUsers");
                 if (users is null)
                 {
                     users = new();
+                    //data doesn't exist in chache, get it from db
                     users=await _context.Users.AsNoTracking().ToListAsync();
+                    //set the data from db to memory cache
                     _memoryCache.Set("AllUsers",users,TimeSpan.FromSeconds(30));
                 }
+
                 var allUsers=new List<QuizUserDTO>();
                 foreach (var user in users)
                 {
@@ -92,7 +97,7 @@ namespace QuizAPI.Controllers
                         Email = user.Email,
                         Age = user.Age,
                         Country = user.Country,
-                        Roles = await _userManager.GetRolesAsync(user)
+                        Roles = await _userManager.GetRolesAsync(user)//get roles linked to this user
                     });
                 }
                 return allUsers;
@@ -153,16 +158,26 @@ namespace QuizAPI.Controllers
                 return NotFound("This User Is Doesn't Exist");
             }
             var userRoles =await _userManager.GetRolesAsync(oldUser);
-
+            //uppercase the words, example: user -> User
             var capitalizedRoleName = new CultureInfo("en-US", false).TextInfo.ToTitleCase(roleName);
-            var role=await _roleManager.FindByNameAsync(capitalizedRoleName);
+            var role=await _roleManager.FindByNameAsync(capitalizedRoleName); // cant add user to a role that doesn't exist
             if (role==null)
             {
                 return BadRequest("Such Role Doesn't Exist");
             }
             foreach (var item in userRoles)
             {
-                await _userManager.RemoveFromRoleAsync(oldUser,item);
+                try
+                {
+                    await _userManager.RemoveFromRoleAsync(oldUser,item);
+                }
+                catch (Exception e)
+                {
+
+                    throw new Exception("error for removing role from user: ",e);
+                }
+                
+
             }
             await _userManager.AddToRoleAsync(oldUser, capitalizedRoleName);
             return Ok();
@@ -177,7 +192,7 @@ namespace QuizAPI.Controllers
             var result = await _userManager.CreateAsync(user, registerUserDTO.Password);
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, "User");
+                await _userManager.AddToRoleAsync(user, "User");// each user will get user role by default
                 await _signInManager.SignInAsync(user, isPersistent: true);
                 return Ok(registerUserDTO);
             }
@@ -220,6 +235,7 @@ namespace QuizAPI.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<RegisterUserDTO>> UpdateUserById([Required] string id, UpdateDTO updateDTO)
         {
             if (!User.Identity.IsAuthenticated)
@@ -235,7 +251,11 @@ namespace QuizAPI.Controllers
             result.Email = updateDTO.Email;
             result.Age=updateDTO.Age;
             result.Country=updateDTO.Country;
-            await _userManager.UpdateAsync(result);
+            var wasSuccessful=await _userManager.UpdateAsync(result);
+            if (!wasSuccessful.Succeeded)
+            {
+                return StatusCode(500);
+            }
             return Ok();
         }
         
